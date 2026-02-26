@@ -1,0 +1,112 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-surface text-bright font-sans antialiased;
+  }
+
+  /* Monospace for all financial numbers */
+  .font-num {
+    @apply font-mono tabular-nums;
+  }
+}
+
+@layer components {
+  /* Card container */
+  .card {
+    @apply bg-surface-1 border border-border rounded-lg p-4;
+  }
+
+  /* Metric value display */
+  .metric-value {
+    @apply font-mono text-2xl font-semibold tabular-nums;
+  }
+
+  .metric-label {
+    @apply text-xs text-muted uppercase tracking-wider;
+  }
+
+  /* P&L colouring */
+  .pnl-pos {
+    @apply text-profit font-mono;
+  }
+
+  .pnl-neg {
+    @apply text-loss font-mono;
+  }
+
+  .pnl-zero {
+    @apply text-muted font-mono;
+  }
+
+  /* Form inputs */
+  .input {
+    @apply bg-surface-2 border border-border rounded px-3 py-2 text-bright
+           text-sm focus:outline-none focus:ring-1 focus:ring-info
+           placeholder-muted w-full;
+  }
+
+  .label {
+    @apply text-xs text-muted uppercase tracking-wide mb-1 block;
+  }
+
+  /* Buttons */
+  .btn-primary {
+    @apply bg-info hover:bg-blue-600 text-white px-4 py-2 rounded text-sm font-medium
+           transition-colors disabled:opacity-40 disabled:cursor-not-allowed;
+  }
+
+  .btn-ghost {
+    @apply border border-border hover:border-info text-muted hover:text-bright px-4 py-2 rounded text-sm
+           transition-colors;
+  }
+
+  .btn-danger {
+    @apply bg-loss hover:bg-red-600 text-white px-4 py-2 rounded text-sm font-medium
+           transition-colors;
+  }
+
+  /* Status badge */
+  .badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded text-xs font-medium font-mono;
+  }
+
+  .badge-open   { @apply bg-info/20 text-info; }
+  .badge-closed { @apply bg-muted/20 text-muted; }
+  .badge-profit { @apply bg-profit/20 text-profit; }
+  .badge-loss   { @apply bg-loss/20 text-loss; }
+
+  /* Alert banners */
+  .alert-danger {
+    @apply bg-loss/10 border border-loss text-loss rounded-lg p-3 text-sm;
+  }
+
+  .alert-warning {
+    @apply bg-warn/10 border border-warn text-warn rounded-lg p-3 text-sm;
+  }
+
+  .alert-info {
+    @apply bg-info/10 border border-info text-info rounded-lg p-3 text-sm;
+  }
+
+  /* Table */
+  .tbl-head { @apply text-xs text-muted uppercase tracking-wider py-2 px-3 text-left; }
+  .tbl-cell { @apply py-2.5 px-3 text-sm border-b border-border/50; }
+
+  /* Sidebar nav link */
+  .nav-link {
+    @apply flex items-center gap-3 px-3 py-2 rounded-md text-sm text-muted
+           hover:text-bright hover:bg-surface-2 transition-colors;
+  }
+
+  .nav-link.active {
+    @apply text-bright bg-surface-2 border-l-2 border-info;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
