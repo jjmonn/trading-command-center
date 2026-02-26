@@ -13,3 +13,4 @@ frontend/dist/
 *.log
 .venv/
 venv/
+.claude/settings.local.json
