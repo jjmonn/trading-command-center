@@ -2,6 +2,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Sidebar from "./components/layout/Sidebar";
 import Dashboard from "./pages/Dashboard";
 import TradeLog from "./pages/TradeLog";
+import Portfolio from "./pages/Portfolio";
 
 function Placeholder({ label }: { label: string }) {
   return (
@@ -20,7 +21,7 @@ export default function App() {
           <Routes>
             <Route path="/"          element={<Dashboard />} />
             <Route path="/trades"    element={<TradeLog />} />
-            <Route path="/portfolio" element={<Placeholder label="Portfolio" />} />
+            <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/signals"   element={<Placeholder label="Social Signals" />} />
             <Route path="/markets"   element={<Placeholder label="Market Trends" />} />
             <Route path="/ai"        element={<Placeholder label="AI Analysis" />} />

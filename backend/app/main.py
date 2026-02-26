@@ -7,7 +7,7 @@ from app.config import STRATEGY_RULES_V1, settings
 from app.database import SessionLocal, engine
 from app.models import trades as _trade_models  # ensure models are registered
 from app.models import social as _social_models  # noqa: F401
-from app.routers import dashboard, trades
+from app.routers import dashboard, portfolio, trades
 
 logging.basicConfig(level=settings.log_level.upper())
 log = logging.getLogger(__name__)
@@ -34,6 +34,7 @@ app.add_middleware(
 # ─── Routers ─────────────────────────────────────────────────────────────────
 app.include_router(trades.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
+app.include_router(portfolio.router, prefix="/api/v1")
 
 
 # ─── Startup ──────────────────────────────────────────────────────────────────

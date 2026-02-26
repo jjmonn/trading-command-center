@@ -215,3 +215,101 @@ export interface RuleChecklistItem {
   category: "entry" | "position" | "risk" | "psychological";
   text: string;
 }
+
+// ─── Portfolio types ──────────────────────────────────────────────────────────
+
+export interface Position {
+  id: number;
+  ib_con_id?: number;
+  ticker: string;
+  instrument_type: string;
+  quantity: number;
+  avg_cost?: number;
+  market_price?: number;
+  market_value?: number;
+  unrealized_pnl?: number;
+  realized_pnl?: number;
+  currency?: string;
+  strike?: number;
+  expiry?: string;
+  option_type?: string;
+  sector?: string;
+  source?: string;
+  is_active?: boolean;
+  notes?: string;
+  last_updated?: string;
+  // Computed
+  pnl_pct?: number;
+  dte?: number;
+  weight_pct?: number;
+}
+
+export interface PositionCreate {
+  ticker: string;
+  instrument_type: string;
+  quantity: number;
+  avg_cost?: number;
+  market_price?: number;
+  currency?: string;
+  strike?: number;
+  expiry?: string;
+  option_type?: string;
+  sector?: string;
+  notes?: string;
+}
+
+export interface PositionUpdate {
+  quantity?: number;
+  avg_cost?: number;
+  market_price?: number;
+  market_value?: number;
+  unrealized_pnl?: number;
+  sector?: string;
+  notes?: string;
+  is_active?: boolean;
+}
+
+export interface PortfolioSummary {
+  total_nav: number;
+  cash_balance: number;
+  invested_value: number;
+  unrealized_pnl: number;
+  total_long_exposure: number;
+  total_short_exposure: number;
+  net_exposure: number;
+  cash_pct: number;
+  leverage_ratio: number;
+  num_positions: number;
+  risk_alerts: string[];
+}
+
+export interface ExposureBreakdown {
+  label: string;
+  value: number;
+  pct: number;
+}
+
+export interface PortfolioHistoryPoint {
+  id: number;
+  timestamp: string;
+  total_nav?: number;
+  cash_balance?: number;
+  invested_value?: number;
+  unrealized_pnl?: number;
+}
+
+export interface PortfolioDashboard {
+  summary: PortfolioSummary;
+  positions: Position[];
+  by_sector: ExposureBreakdown[];
+  by_instrument: ExposureBreakdown[];
+  by_currency: ExposureBreakdown[];
+  history: PortfolioHistoryPoint[];
+}
+
+export interface IBStatus {
+  connected: boolean;
+  host: string;
+  port: number;
+  message: string;
+}
