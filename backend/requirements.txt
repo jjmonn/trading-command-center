@@ -6,7 +6,6 @@ python-multipart==0.0.18
 # ─── Database ─────────────────────────────────────────────────────────────────
 sqlalchemy==2.0.36
 alembic==1.14.0
-psycopg2-binary==2.9.10
 
 # ─── Config / Validation ──────────────────────────────────────────────────────
 pydantic==2.10.3
@@ -21,9 +20,13 @@ yfinance==0.2.50
 # ─── HTTP ─────────────────────────────────────────────────────────────────────
 httpx==0.28.1
 
-# ─── AI ───────────────────────────────────────────────────────────────────────
+# ─── AI (optional — only needed for Module 5) ────────────────────────────────
 anthropic==0.40.0
 
-# ─── Task queue ───────────────────────────────────────────────────────────────
-celery==5.4.0
-redis==5.2.0
+# ─── PostgreSQL (optional — SQLite used by default for dev) ──────────────────
+# Uncomment when using PostgreSQL in production:
+# psycopg2-binary==2.9.10
+
+# ─── Task queue (optional — only needed for background jobs) ─────────────────
+# celery==5.4.0
+# redis==5.2.0
