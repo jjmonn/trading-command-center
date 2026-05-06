@@ -14,11 +14,17 @@ from app.database import get_db
 from app.models.markets import AlignmentScore, FactorSnapshot, Watchlist
 from app.schemas.markets import (
     AlignmentScoreResponse,
+    FactorSnapshotResponse,
     HeatmapEntry,
     ScorecardResponse,
     WatchlistCreate,
     WatchlistResponse,
     WatchlistUpdate,
+)
+from app.services.score_orchestrator import (
+    compute_alignment_score,
+    list_factor_names,
+    score_all_factors,
 )
 
 router = APIRouter()
@@ -236,3 +242,55 @@ def get_score_history(
         .order_by(AlignmentScore.snapshot_date)
         .all()
     )
+
+
+# ─── Factor refresh / scan ───────────────────────────────────────────────────
+
+@router.post(
+    "/markets/{ticker}/refresh",
+    response_model=list[FactorSnapshotResponse],
+    tags=["markets"],
+)
+def refresh_ticker_factors(ticker: str, db: Session = Depends(get_db)):
+    """
+    Run all registered factor scorers for a single ticker, then recompute the
+    composite alignment score. Returns the list of factor snapshots.
+    """
+    ticker = ticker.upper()
+    if not db.query(Watchlist).filter(Watchlist.ticker == ticker).first():
+        raise HTTPException(status_code=404, detail=f"{ticker} not in watchlist")
+
+    snapshots = score_all_factors(db, ticker)
+    compute_alignment_score(db, ticker)
+    return snapshots
+
+
+@router.post(
+    "/markets/scan-all",
+    response_model=dict,
+    tags=["markets"],
+)
+def scan_all_watchlist(db: Session = Depends(get_db)):
+    """
+    Run a full scan of every active watchlist ticker. Slow — minutes for a
+    big watchlist. Cron-callable; also exposed for manual invocation.
+
+    Returns a summary {scanned: N, factors_per_ticker: M, errors: [...]}.
+    """
+    watchlist = db.query(Watchlist).filter(Watchlist.is_active == True).all()  # noqa: E712
+    errors: list[dict] = []
+    scanned = 0
+    for item in watchlist:
+        try:
+            score_all_factors(db, item.ticker)
+            compute_alignment_score(db, item.ticker)
+            scanned += 1
+        except Exception as e:
+            errors.append({"ticker": item.ticker, "error": str(e)})
+
+    return {
+        "scanned": scanned,
+        "total": len(watchlist),
+        "factors": list_factor_names(),
+        "errors": errors,
+    }
