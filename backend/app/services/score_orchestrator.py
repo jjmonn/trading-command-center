@@ -18,7 +18,16 @@ from app.services.factor_scorers.valuation import (
     FACTOR_NAME as VALUATION_NAME,
     score_valuation,
 )
-from app.services.fundamentals_fetcher import get_fundamentals
+from app.services.factor_scorers.sector_trend import (
+    FACTOR_NAME as SECTOR_TREND_NAME,
+    score_sector_trend,
+)
+from app.services.factor_scorers.technical import (
+    FACTOR_NAME as TECHNICAL_NAME,
+    score_technical,
+)
+from app.services.fundamentals_fetcher import SECTOR_ETF_MAP, get_fundamentals
+from app.services.price_fetcher import get_historical_prices
 
 log = logging.getLogger(__name__)
 
@@ -27,6 +36,8 @@ log = logging.getLogger(__name__)
 # Days 4-6 will register additional factors here.
 SCORER_REGISTRY: dict[str, Callable[[str, dict], FactorScore]] = {
     VALUATION_NAME: score_valuation,
+    SECTOR_TREND_NAME: score_sector_trend,
+    TECHNICAL_NAME: score_technical,
 }
 
 
@@ -97,6 +108,31 @@ def score_and_persist(
     return snapshot
 
 
+def _enrich_fundamentals(ticker: str, fundamentals: dict) -> dict:
+    """
+    Inject historical price data into fundamentals dict for scorers that
+    need it (sector_trend, technical). Fetches once, shared across scorers.
+    """
+    enriched = dict(fundamentals)
+
+    # Historical prices for the ticker (6 months for technicals)
+    if "_historical_prices" not in enriched:
+        enriched["_historical_prices"] = get_historical_prices(ticker, period="1y")
+
+    # Sector ETF prices for sector_trend
+    sector = enriched.get("sector")
+    if sector and "_sector_etf_prices" not in enriched:
+        etf = SECTOR_ETF_MAP.get(sector)
+        if etf:
+            enriched["_sector_etf_prices"] = get_historical_prices(etf, period="1y")
+
+    # SPY prices for relative strength
+    if "_spy_prices" not in enriched:
+        enriched["_spy_prices"] = get_historical_prices("SPY", period="1y")
+
+    return enriched
+
+
 def score_all_factors(
     db: Session,
     ticker: str,
@@ -109,6 +145,7 @@ def score_all_factors(
     ticker = ticker.upper().strip()
     snapshot_date = snapshot_date or date_cls.today()
     fundamentals = get_fundamentals(ticker)
+    fundamentals = _enrich_fundamentals(ticker, fundamentals)
 
     snapshots = []
     for factor_name in SCORER_REGISTRY:
